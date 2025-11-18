@@ -1,0 +1,178 @@
+<?php
+
+namespace App\Entity;
+
+use App\Repository\OuvrageRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity(repositoryClass: OuvrageRepository::class)]
+class Ouvrage
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $titre = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $editeur = null;
+
+    #[ORM\Column(type: Types::STRING, length: 255, unique: true, nullable: true)]
+    private ?string $ISBN = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $categories = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $tags = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $langues = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $annee = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $resume = null;
+
+    /**
+     * @var Collection<int, Auteur>
+     */
+    #[ORM\ManyToMany(targetEntity: Auteur::class, inversedBy: 'ouvrages')]
+    private Collection $auteurs;
+
+    public function __construct()
+    {
+        $this->auteurs = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getTitre(): ?string
+    {
+        return $this->titre;
+    }
+
+    public function setTitre(string $titre): static
+    {
+        $this->titre = $titre;
+
+        return $this;
+    }
+
+    public function getEditeur(): ?string
+    {
+        return $this->editeur;
+    }
+
+    public function setEditeur(string $editeur): static
+    {
+        $this->editeur = $editeur;
+
+        return $this;
+    }
+
+    public function getISBN(): ?string
+    {
+        return $this->ISBN;
+    }
+
+    public function setISBN(string $ISBN): static
+    {
+        $this->ISBN = $ISBN;
+
+        return $this;
+    }
+
+    public function getCategories(): ?string
+    {
+        return $this->categories;
+    }
+
+    public function setCategories(string $categories): static
+    {
+        $this->categories = $categories;
+
+        return $this;
+    }
+
+    public function getTags(): ?string
+    {
+        return $this->tags;
+    }
+
+    public function setTags(string $tags): static
+    {
+        $this->tags = $tags;
+
+        return $this;
+    }
+
+    public function getLangues(): ?string
+    {
+        return $this->langues;
+    }
+
+    public function setLangues(string $langues): static
+    {
+        $this->langues = $langues;
+
+        return $this;
+    }
+
+    public function getAnnee(): ?string
+    {
+        return $this->annee;
+    }
+
+    public function setAnnee(string $annee): static
+    {
+        $this->annee = $annee;
+
+        return $this;
+    }
+
+    public function getResume(): ?string
+    {
+        return $this->resume;
+    }
+
+    public function setResume(string $resume): static
+    {
+        $this->resume = $resume;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Auteur>
+     */
+    public function getAuteurs(): Collection
+    {
+        return $this->auteurs;
+    }
+
+    public function addAuteur(Auteur $auteur): static
+    {
+        if (!$this->auteurs->contains($auteur)) {
+            $this->auteurs->add($auteur);
+        }
+
+        return $this;
+    }
+
+    public function removeAuteur(Auteur $auteur): static
+    {
+        $this->auteurs->removeElement($auteur);
+
+        return $this;
+    }
+}

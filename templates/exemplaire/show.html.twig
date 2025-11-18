@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de l'Exemplaire{% endblock %}
+
+{% block body %}
+    <h1>Détails de l'Exemplaire</h1>
+
+    <table class="table">
+        <tbody>
+        {# === PARTIE 1 : L'OBJET PHYSIQUE === #}
+        <tr>
+            <th style="width: 20%;">Id</th>
+            <td>{{ exemplaire.id }}</td>
+        </tr>
+        <tr>
+            <th>Cote</th>
+            <td><strong>{{ exemplaire.cote }}</strong></td>
+        </tr>
+        <tr>
+            <th>État</th>
+            <td>
+                {# Petit bonus visuel : couleur selon l'état #}
+                {% if exemplaire.etat == 'Neuf' %}
+                    <span style="color: green;">{{ exemplaire.etat }}</span>
+                {% elseif exemplaire.etat == 'Hors-service' %}
+                    <span style="color: red;">{{ exemplaire.etat }}</span>
+                {% else %}
+                    {{ exemplaire.etat }}
+                {% endif %}
+            </td>
+        </tr>
+
+        {# === PARTIE 2 : LE LIVRE ASSOCIÉ (OUVRAGE) === #}
+        <tr style="background-color: #f8f9fa;">
+            <th colspan="2" class="text-center">Informations sur l'Ouvrage</th>
+        </tr>
+        <tr>
+            <th>Titre</th>
+            <td>
+                <a href="{{ path('app_ouvrage_show', {'id': exemplaire.ouvrage.id}) }}">
+                    {{ exemplaire.ouvrage.titre }}
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <th>Auteur(s)</th>
+            <td>
+                {# On doit boucler car il y a plusieurs auteurs #}
+                {% for auteur in exemplaire.ouvrage.auteurs %}
+                    {{ auteur.prenom }} {{ auteur.nom }}
+                    {% if not loop.last %}, {% endif %}
+                {% else %}
+                    <em>Inconnu</em>
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <th>Éditeur</th>
+            <td>{{ exemplaire.ouvrage.editeur }}</td>
+        </tr>
+        <tr>
+            <th>ISBN</th>
+            <td>{{ exemplaire.ouvrage.isbn }}</td>
+        </tr>
+        <tr>
+            <th>Année</th>
+            <td>{{ exemplaire.ouvrage.annee }}</td>
+        </tr>
+
+        {# Vos champs texte simples #}
+        <tr>
+            <th>Catégories</th>
+            <td>{{ exemplaire.ouvrage.categories }}</td>
+        </tr>
+        <tr>
+            <th>Tags</th>
+            <td>{{ exemplaire.ouvrage.tags }}</td>
+        </tr>
+        <tr>
+            <th>Langues</th>
+            <td>{{ exemplaire.ouvrage.langues }}</td>
+        </tr>
+        <tr>
+            <th>Résumé</th>
+            <td>{{ exemplaire.ouvrage.resume }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div style="margin-top: 20px;">
+        <a href="{{ path('app_exemplaire_index') }}" class="btn">Retour à la liste</a>
+        <a href="{{ path('app_exemplaire_edit', {'id': exemplaire.id}) }}" class="btn">Modifier</a>
+    </div>
+
+    {{ include('exemplaire/_delete_form.html.twig') }}
+{% endblock %}

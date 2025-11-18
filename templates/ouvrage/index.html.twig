@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ouvrage index{% endblock %}
+
+{% block body %}
+    <h1>Ouvrage index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Titre</th>
+                <th>Editeur</th>
+                <th>ISBN</th>
+                <th>Categories</th>
+                <th>Tags</th>
+                <th>Langues</th>
+                <th>Année</th>
+                <th>Résumé</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for ouvrage in ouvrages %}
+            <tr>
+                <td>{{ ouvrage.id }}</td>
+                <td>{{ ouvrage.titre }}</td>
+                <td>{{ ouvrage.editeur }}</td>
+                <td>{{ ouvrage.ISBN }}</td>
+                <td>{{ ouvrage.categories }}</td>
+                <td>{{ ouvrage.tags }}</td>
+                <td>{{ ouvrage.langues }}</td>
+                <td>{{ ouvrage.année }}</td>
+                <td>{{ ouvrage.résumé }}</td>
+                <td>
+                    <a href="{{ path('app_ouvrage_show', {'id': ouvrage.id}) }}">show</a>
+                    <a href="{{ path('app_ouvrage_edit', {'id': ouvrage.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="10">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_ouvrage_new') }}">Create new</a>
+{% endblock %}

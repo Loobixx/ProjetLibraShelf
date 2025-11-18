@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - LibraShelf{% endblock %}
+
+{% block body %}
+    <h1>Bienvenue sur LibraShelf !</h1>
+
+    {% if app.user %}
+        {% if is_granted('ROLE_ADMIN') %}
+
+            <p>Vous avez un accès administrateur.</p>
+            {# Mettez ici des liens vers le panel admin, etc. #}
+
+        {% elseif is_granted('ROLE_LIBRARIAN') %}
+
+            <p>Vous avez un accès libraire.</p>
+            {# Mettez ici des liens pour les libraires #}
+
+        {% elseif is_granted('ROLE_MEMBER') %}
+
+            <p>Vous avez un accès membre.</p>
+            {# Mettez ici des liens pour les membres #}
+
+        {% else %}
+            {# S'il est connecté mais n'a que le rôle ROLE_USER (implicite) #}
+            <p>Vous avez un accès membre.</p>
+        {% endif %}
+        <a href="{{ path('app_logout') }}">Déconnexion</a>
+    {% else %}
+        <a href="{{ path('app_login') }}">Connexion</a>
+        <br>
+        <a href="{{ path('app_register') }}">S'inscrire</a>
+    {% endif %}
+{% endblock %}

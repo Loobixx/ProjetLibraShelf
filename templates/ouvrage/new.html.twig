@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Ouvrage{% endblock %}
+
+{% block body %}
+    <h1>Create new Ouvrage</h1>
+
+    {{ include('ouvrage/_form.html.twig') }}
+
+    <a href="{{ path('app_ouvrage_index') }}">back to list</a>
+{% endblock %}
