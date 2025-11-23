@@ -19,8 +19,11 @@ class Exemplaire
     #[ORM\Column(length: 255)]
     private ?string $etat = null;
 
+    #[ORM\Column]
+    private ?bool $disponible = true;
+
     #[ORM\ManyToOne(inversedBy: 'exemplaires')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Ouvrage $ouvrage = null;
 
     public function getId(): ?int
@@ -48,6 +51,18 @@ class Exemplaire
     public function setEtat(string $etat): self
     {
         $this->etat = $etat;
+
+        return $this;
+    }
+
+    public function isDisponible(): ?bool
+    {
+        return $this->disponible;
+    }
+
+    public function setDisponible(bool $disponible): self
+    {
+        $this->disponible = $disponible;
 
         return $this;
     }

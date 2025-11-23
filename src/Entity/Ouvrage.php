@@ -46,8 +46,12 @@ class Ouvrage
     #[ORM\ManyToMany(targetEntity: Auteur::class, inversedBy: 'ouvrages')]
     private Collection $auteurs;
 
+    #[ORM\OneToMany(mappedBy: 'ouvrage', targetEntity: Exemplaire::class)]
+    private Collection $exemplaires;
+
     public function __construct()
     {
+        $this->exemplaires = new ArrayCollection();
         $this->auteurs = new ArrayCollection();
     }
 
@@ -174,5 +178,44 @@ class Ouvrage
         $this->auteurs->removeElement($auteur);
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Exemplaire>
+     */
+    public function getExemplaires(): Collection
+    {
+        return $this->exemplaires;
+    }
+
+    public function addExemplaire(Exemplaire $exemplaire): self
+    {
+        if (!$this->exemplaires->contains($exemplaire)) {
+            $this->exemplaires->add($exemplaire);
+            $exemplaire->setOuvrage($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExemplaire(Exemplaire $exemplaire): self
+    {
+        if ($this->exemplaires->removeElement($exemplaire)) {
+            if ($exemplaire->getOuvrage() === $this) {
+                $exemplaire->setOuvrage(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function isDisponible(): bool
+    {
+        foreach ($this->getExemplaires() as $exemplaire) {
+            if ($exemplaire->isDisponible()) { // Si un exemplaire est disponible, alors on valide
+                return true;
+            }
+        }
+        return false;
     }
 }

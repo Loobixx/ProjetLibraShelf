@@ -1,11 +1,182 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Ouvrage{% endblock %}
+{% block title %}Nouveau Livre{% endblock %}
 
 {% block body %}
-    <h1>Create new Ouvrage</h1>
+    <div class="row justify-content-center mt-4 mb-5">
+        <div class="col-lg-10">
 
-    {{ include('ouvrage/_form.html.twig') }}
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
 
-    <a href="{{ path('app_ouvrage_index') }}">back to list</a>
+                {# En-tête moderne #}
+                <div class="card-header bg-primary text-white py-3 px-4 border-0">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3">
+                            <i class="bi bi-book-fill fs-4 text-white"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0 fw-bold">Nouveau Livre</h4>
+                            <small class="text-white-50">Saisissez les informations de l'ouvrage</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-5 bg-white">
+
+                    {{ form_start(form) }}
+
+                    <div class="row g-5">
+
+                        {# === COLONNE GAUCHE : INFORMATIONS PRINCIPALES === #}
+                        <div class="col-lg-7 border-end-lg">
+                            <h6 class="text-uppercase text-primary fw-bold small mb-4 ls-1">
+                                <i class="bi bi-info-circle me-1"></i> Informations Générales
+                            </h6>
+
+                            {# Titre #}
+                            <div class="form-floating mb-3">
+                                {{ form_widget(form.titre, {'attr': {'class': 'form-control', 'placeholder': 'Titre'}}) }}
+                                {{ form_label(form.titre) }}
+                            </div>
+
+                            {# Éditeur & Année sur la même ligne #}
+                            <div class="row g-2">
+                                <div class="col-md-8">
+                                    <div class="form-floating mb-3">
+                                        {{ form_widget(form.editeur, {'attr': {'class': 'form-control', 'placeholder': 'Éditeur'}}) }}
+                                        {{ form_label(form.editeur) }}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3">
+                                        {{ form_widget(form.annee, {'attr': {'class': 'form-control', 'placeholder': 'Année'}}) }}
+                                        {{ form_label(form.annee) }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {# ISBN #}
+                            <div class="form-floating mb-3">
+                                {{ form_widget(form.ISBN, {'attr': {'class': 'form-control', 'placeholder': 'ISBN'}}) }}
+                                {{ form_label(form.ISBN) }}
+                            </div>
+
+                            {# Résumé #}
+                            <div class="form-floating mb-3">
+                                {{ form_widget(form.resume, {'attr': {'class': 'form-control', 'placeholder': 'Résumé', 'style': 'height: 150px'}}) }}
+                                {{ form_label(form.resume) }}
+                            </div>
+                        </div>
+
+                        {# === COLONNE DROITE : DÉTAILS === #}
+                        <div class="col-lg-5">
+                            <h6 class="text-uppercase text-primary fw-bold small mb-4 ls-1">
+                                <i class="bi bi-tags me-1"></i> Classification
+                            </h6>
+
+                            <div class="accordion shadow-sm rounded" id="accordionDetails">
+
+                                {# Langues #}
+                                <div class="accordion-item border-0">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed bg-light text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLang">
+                                            <i class="bi bi-translate me-2 text-secondary"></i> Langues
+                                        </button>
+                                    </h2>
+                                    <div id="collapseLang" class="accordion-collapse collapse" data-bs-parent="#accordionDetails">
+                                        <div class="accordion-body p-3">
+                                            {{ form_widget(form.langues, {'attr': {'class': 'form-control'}}) }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {# Catégories #}
+                                <div class="accordion-item border-0">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed bg-light text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCat">
+                                            <i class="bi bi-bookmarks me-2 text-secondary"></i> Catégories
+                                        </button>
+                                    </h2>
+                                    <div id="collapseCat" class="accordion-collapse collapse" data-bs-parent="#accordionDetails">
+                                        <div class="accordion-body p-3">
+                                            {{ form_widget(form.categories, {'attr': {'class': 'form-control'}}) }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {# Tags #}
+                                <div class="accordion-item border-0">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed bg-light text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTag">
+                                            <i class="bi bi-hash me-2 text-secondary"></i> Tags
+                                        </button>
+                                    </h2>
+                                    <div id="collapseTag" class="accordion-collapse collapse" data-bs-parent="#accordionDetails">
+                                        <div class="accordion-body p-3">
+                                            {{ form_widget(form.tags, {'attr': {'class': 'form-control'}}) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {# Zone Auteurs #}
+                            <div class="mt-4">
+                                <label class="fw-bold text-dark mb-2 d-flex justify-content-between">
+                                    <span><i class="bi bi-people-fill text-primary me-1"></i> Auteurs</span>
+                                    <small class="text-muted fw-normal">Cochez les auteurs</small>
+                                </label>
+
+                                <div class="card border-0 shadow-sm bg-light">
+                                    <div class="p-2 border-bottom">
+                                        <input type="text" id="searchAuteurs" class="form-control form-control-sm border-0" placeholder="🔍 Filtrer la liste...">
+                                    </div>
+
+                                    {# Liste scrollable #}
+                                    <div class="list-group list-group-flush overflow-auto bg-white" style="max-height: 200px;" id="auteursContainer">
+                                        {% for child in form.auteurs %}
+                                            <label class="list-group-item list-group-item-action border-0 py-2 px-3 author-item d-flex align-items-center cursor-pointer">
+                                                {{ form_widget(child, {'attr': {'class': 'form-check-input me-2 mt-0'}}) }}
+                                                <span class="small text-dark">{{ child.vars.label }}</span>
+                                            </label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <hr class="my-5">
+
+                    {# Actions #}
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{{ path('app_ouvrage_index') }}" class="btn btn-light btn-lg px-4 border">Annuler</a>
+                        <button class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">
+                            <i class="bi bi-check-lg me-2"></i>Enregistrer le livre
+                        </button>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const searchInput = document.getElementById('searchAuteurs');
+            const items = document.getElementsByClassName('author-item');
+
+            searchInput.addEventListener('keyup', function() {
+                const filter = this.value.toLowerCase();
+                for (let item of items) {
+                    const text = item.textContent.toLowerCase();
+                    item.style.display = text.includes(filter) ? "" : "none";
+                }
+            });
+        });
+    </script>
 {% endblock %}

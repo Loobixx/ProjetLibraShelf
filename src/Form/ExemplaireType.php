@@ -1,13 +1,11 @@
 <?php
-// src/Form/ExemplaireType.php
 
 namespace App\Form;
 
 use App\Entity\Exemplaire;
-use App\Entity\Ouvrage;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -23,17 +21,21 @@ class ExemplaireType extends AbstractType
                     'Bon' => 'Bon',
                     'Usagé' => 'Usage',
                     'Endommagé' => 'Endommage',
-                    'Hors-service' => 'Hors-service',
                 ],
                 'placeholder' => 'Choisir un état',
             ])
-            ->add('ouvrage', EntityType::class, [
-                'class' => Ouvrage::class,
-                'choice_label' => 'titre',
-                'placeholder' => 'Choisir un ouvrage'
-            ]);
+            ->add('disponible', CheckboxType::class, [
+                'label'    => 'Cet exemplaire est-il disponible immédiatement ?',
+                'required' => false,
+                'help'     => 'Décochez si le livre est en réparation ou mis de côté.',
+            ])
         ;
     }
 
-    // ...
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => Exemplaire::class,
+        ]);
+    }
 }

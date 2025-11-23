@@ -2,33 +2,124 @@
 
 {% block title %}Accueil - LibraShelf{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .welcome-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+        .welcome-card:hover { transform: translateY(-5px); }
+        .role-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .btn-space { margin-right: 10px; margin-bottom: 10px; }
+    </style>
+{% endblock %}
+
 {% block body %}
-    <h1>Bienvenue sur LibraShelf !</h1>
+    <div class="container mt-5">
 
-    {% if app.user %}
-        {% if is_granted('ROLE_ADMIN') %}
+        {# === CAS 1 : L'UTILISATEUR EST CONNECTÉ === #}
+        {% if app.user %}
 
-            <p>Vous avez un accès administrateur.</p>
-            {# Mettez ici des liens vers le panel admin, etc. #}
+            <div class="row justify-content-center">
+                <div class="col-md-10">
+                    <div class="text-center mb-4">
+                        <h1 class="display-5 fw-bold text-primary">Bienvenue !</h1>
+                        <p class="lead text-muted">Heureux de vous revoir sur LibraShelf.</p>
+                    </div>
 
-        {% elseif is_granted('ROLE_LIBRARIAN') %}
+                    {# --- LOGIQUE DES RÔLES --- #}
 
-            <p>Vous avez un accès libraire.</p>
-            {# Mettez ici des liens pour les libraires #}
+                    {# 1. ADMIN #}
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <div class="card welcome-card border-start border-danger border-5 mb-4">
+                            <div class="card-body p-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0 text-danger role-icon">🛡️</div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h3 class="card-title text-danger">Administration</h3>
+                                        <p class="card-text">Vous avez tous les droits de gestion.</p>
+                                        <div class="mt-3">
+                                            <a href="{{ path('app_admin_settings') }}" class="btn btn-info text-white btn-space">
+                                                Gérer les paramètre
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-        {% elseif is_granted('ROLE_MEMBER') %}
+                        {# 2. LIBRAIRE #}
+                    {% elseif is_granted('ROLE_LIBRARIAN') %}
+                        <div class="card welcome-card border-start border-info border-5 mb-4">
+                            <div class="card-body p-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0 text-info role-icon">📚</div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h3 class="card-title text-info">Espace Libraire</h3>
+                                        <p class="card-text">Gérez le catalogue et les stocks.</p>
+                                        <div class="mt-3">
+                                            <a href="{{ path('app_ouvrage_index') }}" class="btn btn-info text-white btn-space">
+                                                Gérer les Ouvrages
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
 
-            <p>Vous avez un accès membre.</p>
-            {# Mettez ici des liens pour les membres #}
+                        {# 3. MEMBRE #}
+                    {% if is_granted('ROLE_MEMBER') or is_granted('ROLE_USER') %}
+                        <div class="card welcome-card border-start border-success border-5 mb-4">
+                            <div class="card-body p-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0 text-success role-icon">👋</div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h3 class="card-title text-success">Espace Membre</h3>
+                                        <p class="card-text">Consultez le catalogue et réservez vos prochaines lectures.</p>
+                                        <div class="mt-3">
+                                            <a href="{{ path('app_catalog_index') }}" class="btn btn-success btn-space">
+                                                <i class="bi bi-collection"></i> Parcourir le Catalogue
+                                            </a>
+                                            <a href="{{ path('app_catalog_mes_reservations') }}" class="btn btn-outline-success btn-space">
+                                                <i class="bi bi-calendar-check"></i> Mes Réservations
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
+                    {% endif %}
+
+                    <div class="text-center mt-5">
+                        <a href="{{ path('app_logout') }}" class="btn btn-outline-dark px-4 rounded-pill">
+                            Déconnexion
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# === CAS 2 : VISITEUR NON CONNECTÉ === #}
         {% else %}
-            {# S'il est connecté mais n'a que le rôle ROLE_USER (implicite) #}
-            <p>Vous avez un accès membre.</p>
+
+            <div class="p-5 mb-4 bg-light rounded-3 shadow-sm text-center">
+                <div class="container-fluid py-5">
+                    <h1 class="display-5 fw-bold text-primary">Bienvenue sur LibraShelf</h1>
+                    <p class="col-md-8 fs-4 mx-auto text-muted">
+                        La solution moderne pour gérer votre bibliothèque.
+                    </p>
+                    <div class="d-flex justify-content-center gap-3 mt-4">
+                        <a href="{{ path('app_login') }}" class="btn btn-primary btn-lg px-5">Connexion</a>
+                        <a href="{{ path('app_register') }}" class="btn btn-outline-secondary btn-lg px-5">S'inscrire</a>
+                    </div>
+                </div>
+            </div>
+
         {% endif %}
-        <a href="{{ path('app_logout') }}">Déconnexion</a>
-    {% else %}
-        <a href="{{ path('app_login') }}">Connexion</a>
-        <br>
-        <a href="{{ path('app_register') }}">S'inscrire</a>
-    {% endif %}
+
+    </div>
 {% endblock %}

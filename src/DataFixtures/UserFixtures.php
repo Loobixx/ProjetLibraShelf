@@ -1,10 +1,12 @@
 <?php
-//Ce fichier permet de créé les ADMIN et les Libraire
+
 namespace App\DataFixtures;
 
 use App\Entity\Auteur;
+use App\Entity\Exemplaire;
 use App\Entity\Ouvrage;
 use App\Entity\Personne;
+use App\Entity\Reservation;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -12,7 +14,6 @@ use Faker\Factory;
 
 class UserFixtures extends Fixture
 {
-
     private UserPasswordHasherInterface $passwordHasher;
 
     public function __construct(UserPasswordHasherInterface $passwordHasher)
@@ -22,84 +23,173 @@ class UserFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        $admin1 = new Personne();
-        $admin1->setEmail('admin1@gmail.com');
-        $admin1->setRoles(['ROLE_ADMIN']);
-        $admin1->setPassword($this->passwordHasher->hashPassword(
-            $admin1,
-            'admin1'
-        ));
-        $manager->persist($admin1);
+        $faker = Factory::create('fr_FR');
 
-        $admin2 = new Personne();
-        $admin2->setEmail('admin2@gmail.com');
-        $admin2->setRoles(['ROLE_ADMIN']);
-        $admin2->setPassword($this->passwordHasher->hashPassword(
-            $admin2,
-            'admin2'
-        ));
-        $manager->persist($admin2);
+        // ======================================================
+        // 1. UTILISATEURS FIXES (Pour se connecter)
+        // ======================================================
 
+        $admin = new Personne();
+        $admin->setEmail('admin1@gmail.com');
+        $admin->setRoles(['ROLE_ADMIN']);
+        $admin->setPassword($this->passwordHasher->hashPassword($admin, 'admin1'));
+        $manager->persist($admin);
 
         $librarian = new Personne();
         $librarian->setEmail('librarian1@gmail.com');
-        $librarian->setRoles(['ROLE_LIBRARIAN']);
-        $librarian->setPassword($this->passwordHasher->hashPassword(
-            $librarian,
-            'librarian1'
-        ));
+        $librarian->setRoles(['ROLE_LIBRARIAN']); // Attention au nom du rôle (LIBRAIRE ou LIBRARIAN selon votre security.yaml)
+        $librarian->setPassword($this->passwordHasher->hashPassword($librarian, 'librarian1'));
         $manager->persist($librarian);
 
+        $memberVIP = new Personne(); // C'est VOUS
+        $memberVIP->setEmail('member1@gmail.com');
+        $memberVIP->setRoles(['ROLE_MEMBRE']);
+        $memberVIP->setPassword($this->passwordHasher->hashPassword($memberVIP, 'member1'));
+        $manager->persist($memberVIP);
 
-        $member = new Personne();
-        $member->setEmail('member1@gmail.com');
-        $member->setRoles(['ROLE_MEMBER']);
-        $member->setPassword($this->passwordHasher->hashPassword(
-            $member,
-            'member1'
-        ));
-        $manager->persist($member);
+        // Création de membres aléatoires pour peupler la base
+        $randomMembers = [];
+        for ($i = 0; $i < 15; $i++) {
+            $m = new Personne();
+            $m->setEmail($faker->unique()->email());
+            $m->setRoles(['ROLE_MEMBRE']);
+            $m->setPassword($this->passwordHasher->hashPassword($m, 'password'));
+            $manager->persist($m);
+            $randomMembers[] = $m;
+        }
+        // On vous ajoute à la liste des membres potentiels pour les tirages au sort
+        $randomMembers[] = $memberVIP;
 
 
-        $faker = Factory::create('fr_FR');
-
-        // === 2. CRÉER 100 FAUX AUTEURS ===
-        $listeAuteurs = []; // On va les garder en mémoire
-        for ($i = 0; $i < 100; $i++) {
+        // ======================================================
+        // 2. AUTEURS
+        // ======================================================
+        $listeAuteurs = [];
+        for ($i = 0; $i < 50; $i++) {
             $auteur = new Auteur();
-            $auteur->setNom($faker->lastName());   // Nom de famille au hasard
-            $auteur->setPrenom($faker->firstName()); // Prénom au hasard
-
+            $auteur->setNom($faker->lastName());
+            $auteur->setPrenom($faker->firstName());
             $manager->persist($auteur);
-            $listeAuteurs[] = $auteur; // On ajoute l'auteur créé à notre liste
+            $listeAuteurs[] = $auteur;
         }
 
-        // === 3. CRÉER 500 FAUX OUVRAGES ===
-        $categoriesPossibles = ['Roman', 'Policier', 'Science-Fiction', 'Fantasy', 'Histoire', 'Biographie'];
-        $tagsPossibles = ['Classique', 'Nouveauté', 'Best-seller', 'Aventure', 'Amour', 'Guerre'];
 
-        for ($i = 0; $i < 500; $i++) {
+        // ======================================================
+        // 3. OUVRAGES
+        // ======================================================
+        $categories = ['Roman', 'Policier', 'SF', 'Fantasy', 'Biographie', 'Histoire', 'Jeunesse'];
+        $tagsList = ['Best-seller', 'Coup de coeur', 'Nouveauté', 'Classique', 'Primé', 'Adapté au cinéma'];
+
+        for ($i = 0; $i < 200; $i++) {
             $ouvrage = new Ouvrage();
-
-            // Utiliser Faker pour générer des fausses données
-            $ouvrage->setTitre($faker->sentence(4)); // Un titre de 4 mots
-            $ouvrage->setEditeur($faker->company());   // Un nom d'entreprise
-            $ouvrage->setIsbn($faker->isbn13());       // Un faux ISBN
-            $ouvrage->setAnnee((string)$faker->year()); // Une année au hasard (convertie en string)
-            $ouvrage->setResume($faker->paragraph(3)); // Un résumé de 3 paragraphes
-
-            // Utiliser Faker pour choisir au hasard dans nos listes
+            $ouvrage->setTitre($faker->catchPhrase());
+            $ouvrage->setEditeur($faker->company());
+            $ouvrage->setIsbn($faker->isbn13());
+            $ouvrage->setAnnee((string)$faker->year());
+            $ouvrage->setResume($faker->paragraph(3));
             $ouvrage->setLangues($faker->randomElement(['Français', 'Anglais', 'Espagnol']));
-            $ouvrage->setCategories($faker->randomElement($categoriesPossibles));
-            $ouvrage->setTags(implode(', ', $faker->randomElements($tagsPossibles, 3))); // 3 tags au hasard
+            $ouvrage->setCategories($faker->randomElement($categories));
+            $ouvrage->setTags(implode(', ', $faker->randomElements($tagsList, 2)));
 
-            // Lier 1 à 3 auteurs au hasard depuis notre liste
-            $auteursDuLivre = $faker->randomElements($listeAuteurs, $faker->numberBetween(1, 3));
-            foreach ($auteursDuLivre as $auteur) {
-                $ouvrage->addAuteur($auteur);
+            // Auteurs (1 ou 2)
+            $nbAuteurs = $faker->numberBetween(1, 2);
+            for ($k = 0; $k < $nbAuteurs; $k++) {
+                $ouvrage->addAuteur($faker->randomElement($listeAuteurs));
             }
 
             $manager->persist($ouvrage);
+
+            // ======================================================
+            // 4. EXEMPLAIRES & SITUATIONS
+            // ======================================================
+
+            // On décide aléatoirement du nombre d'exemplaires (0 à 4)
+            $nbExemplaires = $faker->numberBetween(0, 4);
+
+            for ($j = 1; $j <= $nbExemplaires; $j++) {
+                $exemplaire = new Exemplaire();
+                $exemplaire->setOuvrage($ouvrage);
+                // Cote style bibliothèque : 3 lettres auteur + chiffre
+                $cote = strtoupper(substr($ouvrage->getEditeur(), 0, 3)) . '-' . $faker->numberBetween(10000, 99999);
+                $exemplaire->setCote($cote);
+                $exemplaire->setEtat($faker->randomElement(['Neuf', 'Bon', 'Usagé']));
+                $exemplaire->setDisponible(true); // Par défaut
+
+                // SCÉNARIOS D'EMPRUNT
+                $scenario = $faker->numberBetween(1, 10);
+
+                if ($scenario <= 3) {
+                    // --- CAS A : LIVRE EMPRUNTÉ (En cours) ---
+                    // 30% de chance
+                    $exemplaire->setDisponible(false);
+
+                    $resa = new Reservation();
+                    $resa->setOuvrage($ouvrage);
+                    $resa->setExemplaire($exemplaire);
+
+                    // On force quelques emprunts pour VOUS (member1)
+                    if ($i < 5 && $j == 1) {
+                        $emprunteur = $memberVIP; // Les 5 premiers livres sont pour vous !
+                    } else {
+                        $emprunteur = $faker->randomElement($randomMembers);
+                    }
+                    $resa->setPersonne($emprunteur);
+
+                    // Dates
+                    $dateEmprunt = \DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-20 days', 'now'));
+                    $resa->setDateReservation($dateEmprunt);
+                    // Retour prévu dans le futur
+                    $resa->setDateRetourPrevue($dateEmprunt->modify('+30 days'));
+
+                    $manager->persist($resa);
+
+                } elseif ($scenario <= 5) {
+                    // --- CAS B : LIVRE RENDU (Historique) ---
+                    // 20% de chance
+                    $exemplaire->setDisponible(true);
+
+                    $resa = new Reservation();
+                    $resa->setOuvrage($ouvrage);
+                    $resa->setExemplaire($exemplaire);
+                    $resa->setPersonne($faker->randomElement($randomMembers)); // Peut être vous ou un autre
+
+                    // Dates passées
+                    $dateEmprunt = \DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-6 months', '-2 months'));
+                    $resa->setDateReservation($dateEmprunt);
+                    $resa->setDateRetourPrevue($dateEmprunt->modify('+30 days'));
+                    $resa->setDateRetourReelle($dateEmprunt->modify('+' . $faker->numberBetween(5, 35) . ' days')); // Rendu un peu avant ou après
+
+                    $manager->persist($resa);
+                }
+                // Sinon (50%), le livre est juste disponible en rayon sans historique récent.
+
+                $manager->persist($exemplaire);
+            }
+
+            // ======================================================
+            // 5. LISTE D'ATTENTE (Sur certains livres)
+            // ======================================================
+            // Si le livre a peu d'exemplaires ou est populaire, on ajoute une file d'attente
+            if ($nbExemplaires < 2 && $faker->boolean(40)) {
+                $resaAttente = new Reservation();
+                $resaAttente->setOuvrage($ouvrage);
+                $resaAttente->setExemplaire(null); // Pas d'exemplaire = Liste d'attente
+                $resaAttente->setDateRetourPrevue(null);
+                $resaAttente->setDateRetourReelle(null);
+
+                // On met VOUS en liste d'attente sur quelques livres
+                if ($i > 10 && $i < 13) {
+                    $attendeur = $memberVIP;
+                } else {
+                    $attendeur = $faker->randomElement($randomMembers);
+                }
+                $resaAttente->setPersonne($attendeur);
+
+                $dateDemande = \DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-10 days', 'now'));
+                $resaAttente->setDateReservation($dateDemande);
+
+                $manager->persist($resaAttente);
+            }
         }
 
         $manager->flush();

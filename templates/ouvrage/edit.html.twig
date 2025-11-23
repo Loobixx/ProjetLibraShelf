@@ -1,13 +1,204 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Ouvrage{% endblock %}
+{% block title %}Modifier le Livre{% endblock %}
 
 {% block body %}
-    <h1>Edit Ouvrage</h1>
+    <div class="row justify-content-center mt-4 mb-5">
+        <div class="col-lg-10">
 
-    {{ include('ouvrage/_form.html.twig', {'button_label': 'Update'}) }}
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
 
-    <a href="{{ path('app_ouvrage_index') }}">back to list</a>
+                {# Modification #}
+                <div class="card-header bg-warning py-3 px-4 border-0">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-white bg-opacity-50 rounded-circle p-2 me-3">
+                                <i class="bi bi-pencil-square fs-4 text-dark"></i>
+                            </div>
+                            <div>
+                                <h4 class="mb-0 fw-bold text-dark">Modifier l'ouvrage</h4>
+                                <small class="text-dark text-opacity-75">Mettez à jour les informations</small>
+                            </div>
+                        </div>
+                        <span class="badge bg-white text-warning border border-warning fs-6">ID: {{ ouvrage.id }}</span>
+                    </div>
+                </div>
 
-    {{ include('ouvrage/_delete_form.html.twig') }}
+                <div class="card-body p-5 bg-white">
+
+                    {{ form_start(form) }}
+
+                    <div class="row g-5">
+
+                        {# === COLONNE GAUCHE : INFORMATIONS === #}
+                        <div class="col-lg-7 border-end-lg">
+                            <h6 class="text-uppercase text-warning fw-bold small mb-4 ls-1 text-dark">
+                                <i class="bi bi-info-circle me-1"></i> Informations Générales
+                            </h6>
+
+                            {# Titre #}
+                            <div class="form-floating mb-3">
+                                {{ form_widget(form.titre, {'attr': {'class': 'form-control', 'placeholder': 'Titre'}}) }}
+                                {{ form_label(form.titre) }}
+                            </div>
+
+                            {# Éditeur & Année #}
+                            <div class="row g-2">
+                                <div class="col-md-8">
+                                    <div class="form-floating mb-3">
+                                        {{ form_widget(form.editeur, {'attr': {'class': 'form-control', 'placeholder': 'Éditeur'}}) }}
+                                        {{ form_label(form.editeur) }}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3">
+                                        {{ form_widget(form.annee, {'attr': {'class': 'form-control', 'placeholder': 'Année'}}) }}
+                                        {{ form_label(form.annee) }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {# ISBN #}
+                            <div class="form-floating mb-3">
+                                {{ form_widget(form.ISBN, {'attr': {'class': 'form-control', 'placeholder': 'ISBN'}}) }}
+                                {{ form_label(form.ISBN) }}
+                            </div>
+
+                            {# Résumé #}
+                            <div class="form-floating mb-3">
+                                {{ form_widget(form.resume, {'attr': {'class': 'form-control', 'placeholder': 'Résumé', 'style': 'height: 150px'}}) }}
+                                {{ form_label(form.resume) }}
+                            </div>
+                        </div>
+
+                        {# === COLONNE DROITE : DÉTAILS === #}
+                        <div class="col-lg-5">
+                            <h6 class="text-uppercase text-warning fw-bold small mb-4 ls-1 text-dark">
+                                <i class="bi bi-tags me-1"></i> Classification
+                            </h6>
+
+                            <div class="accordion shadow-sm rounded" id="accordionDetails">
+
+                                {# Langues #}
+                                <div class="accordion-item border-0">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed bg-light text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLang">
+                                            <i class="bi bi-translate me-2 text-secondary"></i> Langues
+                                        </button>
+                                    </h2>
+                                    <div id="collapseLang" class="accordion-collapse collapse" data-bs-parent="#accordionDetails">
+                                        <div class="accordion-body p-3">
+                                            {{ form_widget(form.langues, {'attr': {'class': 'form-control'}}) }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {# Catégories #}
+                                <div class="accordion-item border-0">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed bg-light text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCat">
+                                            <i class="bi bi-bookmarks me-2 text-secondary"></i> Catégories
+                                        </button>
+                                    </h2>
+                                    <div id="collapseCat" class="accordion-collapse collapse" data-bs-parent="#accordionDetails">
+                                        <div class="accordion-body p-3">
+                                            {{ form_widget(form.categories, {'attr': {'class': 'form-control'}}) }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {# Tags #}
+                                <div class="accordion-item border-0">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed bg-light text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTag">
+                                            <i class="bi bi-hash me-2 text-secondary"></i> Tags
+                                        </button>
+                                    </h2>
+                                    <div id="collapseTag" class="accordion-collapse collapse" data-bs-parent="#accordionDetails">
+                                        <div class="accordion-body p-3">
+                                            {{ form_widget(form.tags, {'attr': {'class': 'form-control'}}) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {# Zone Auteurs #}
+                            <div class="mt-4">
+                                <label class="fw-bold text-dark mb-2 d-flex justify-content-between">
+                                    <span><i class="bi bi-people-fill text-warning me-1 text-dark"></i> Auteurs</span>
+                                    <small class="text-muted fw-normal">Cochez les auteurs</small>
+                                </label>
+
+                                <div class="card border-0 shadow-sm bg-light">
+                                    <div class="p-2 border-bottom">
+                                        <input type="text" id="searchAuteurs" class="form-control form-control-sm border-0" placeholder="🔍 Filtrer la liste...">
+                                    </div>
+
+                                    <div class="list-group list-group-flush overflow-auto bg-white" style="max-height: 200px;" id="auteursContainer">
+                                        {% for child in form.auteurs %}
+                                            <label class="list-group-item list-group-item-action border-0 py-2 px-3 author-item d-flex align-items-center cursor-pointer">
+                                                {{ form_widget(child, {'attr': {'class': 'form-check-input me-2 mt-0'}}) }}
+                                                <span class="small text-dark">{{ child.vars.label }}</span>
+                                            </label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <hr class="my-5">
+
+                    {# Actions Principales #}
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{{ path('app_ouvrage_index') }}" class="btn btn-light btn-lg px-4 border">Annuler</a>
+
+                        <button class="btn btn-warning btn-lg px-5 rounded-pill shadow-sm fw-bold">
+                            <i class="bi bi-check-circle me-2"></i>Mettre à jour
+                        </button>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+
+                {# --- ZONE DE DANGER --- #}
+                <div class="card-footer bg-light border-top p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong class="text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Zone de danger</strong>
+                            <p class="text-muted small mb-0">Cette action est irréversible.</p>
+                        </div>
+
+                        <form method="post" action="{{ path('app_ouvrage_delete', {'id': ouvrage.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce livre ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ouvrage.id) }}">
+                            <button class="btn btn-outline-danger">
+                                <i class="bi bi-trash me-1"></i>Supprimer ce livre
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{# Recherche Auteurs #}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const searchInput = document.getElementById('searchAuteurs');
+            const items = document.getElementsByClassName('author-item');
+
+            searchInput.addEventListener('keyup', function() {
+                const filter = this.value.toLowerCase();
+                for (let item of items) {
+                    const text = item.textContent.toLowerCase();
+                    item.style.display = text.includes(filter) ? "" : "none";
+                }
+            });
+        });
+    </script>
 {% endblock %}
