@@ -1,49 +1,149 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Ouvrage index{% endblock %}
+{% block title %}Gestion des Ouvrages{% endblock %}
 
 {% block body %}
-    <h1>Ouvrage index</h1>
+    <div class="container-fluid mt-4">
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Titre</th>
-                <th>Editeur</th>
-                <th>ISBN</th>
-                <th>Categories</th>
-                <th>Tags</th>
-                <th>Langues</th>
-                <th>Année</th>
-                <th>Résumé</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for ouvrage in ouvrages %}
-            <tr>
-                <td>{{ ouvrage.id }}</td>
-                <td>{{ ouvrage.titre }}</td>
-                <td>{{ ouvrage.editeur }}</td>
-                <td>{{ ouvrage.ISBN }}</td>
-                <td>{{ ouvrage.categories }}</td>
-                <td>{{ ouvrage.tags }}</td>
-                <td>{{ ouvrage.langues }}</td>
-                <td>{{ ouvrage.année }}</td>
-                <td>{{ ouvrage.résumé }}</td>
-                <td>
-                    <a href="{{ path('app_ouvrage_show', {'id': ouvrage.id}) }}">show</a>
-                    <a href="{{ path('app_ouvrage_edit', {'id': ouvrage.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="10">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        {# --- EN-TÊTE --- #}
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h2 fw-bold text-dark">Catalogue des Ouvrages</h1>
+                <p class="text-muted">Gérez ici les livres et accédez à leurs exemplaires.</p>
+            </div>
+            <a href="{{ path('app_ouvrage_new') }}" class="btn btn-primary btn-lg shadow-sm">
+                <i class="bi bi-plus-circle me-2"></i>Ajouter un livre
+            </a>
+        </div>
 
-    <a href="{{ path('app_ouvrage_new') }}">Create new</a>
+        {# --- BARRE DE FILTRES --- #}
+        {% if formFilter is defined %}
+            <div class="card border-0 shadow-sm mb-4 rounded-3">
+                <div class="card-body p-2">
+                    {{ form_start(formFilter) }}
+
+                    <div class="row g-2 align-items-center">
+
+                        {# 1. RECHERCHE PRINCIPALE #}
+                        <div class="col-lg-4 col-md-12">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-muted">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                {{ form_widget(formFilter.query, {'attr': {'class': 'form-control border-start-0 ps-0', 'placeholder': 'Rechercher un titre...'}}) }}
+                            </div>
+                        </div>
+
+                        {# 2. FILTRES SECONDAIRES #}
+                        <div class="col-lg-2 col-md-4">
+                            {{ form_widget(formFilter.auteur, {'attr': {'class': 'form-select', 'aria-label': 'Auteur'}}) }}
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            {{ form_widget(formFilter.categorie, {'attr': {'class': 'form-control', 'placeholder': 'Catégorie'}}) }}
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            {{ form_widget(formFilter.sort, {'attr': {'class': 'form-select'}}) }}
+                        </div>
+
+                        {# 3. BOUTON ACTION #}
+                        <div class="col-lg-2 col-md-12">
+                            <button type="submit" class="btn btn-primary w-100 fw-bold">
+                                Rechercher
+                            </button>
+                        </div>
+
+                    </div>
+                    {{ form_end(formFilter) }}
+                </div>
+            </div>
+        {% endif %}
+
+        {# --- LE TABLEAU --- #}
+        <div class="card border-0 shadow rounded-3 overflow-hidden bg-white">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle mb-0">
+                        <thead class="bg-dark text-white">
+                        <tr>
+                            <th class="py-3 ps-4">Ouvrage / Auteur / Éditeur</th>
+                            <th>Infos</th>
+                            <th>Catégories & Tags</th>
+                            <th style="width: 30%;">Résumé</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for ouvrage in ouvrages %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-bold text-primary fs-5">{{ ouvrage.titre }}</div>
+                                    <div class="my-1">
+                                        {% for auteur in ouvrage.auteurs %}
+                                            <span class="badge bg-light text-dark border me-1">
+                                                <i class="bi bi-person-fill text-secondary"></i> {{ auteur.prenom }} {{ auteur.nom }}
+                                            </span>
+                                        {% else %}
+                                            <small class="text-muted fst-italic">Auteur inconnu</small>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="text-muted small">
+                                        <i class="bi bi-building me-1"></i> {{ ouvrage.editeur }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-column gap-1">
+                                        <span class="badge bg-secondary rounded-pill">ISBN: {{ ouvrage.ISBN }}</span>
+                                        <span class="badge bg-info text-dark rounded-pill">Année: {{ ouvrage.annee }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <small class="d-block text-truncate" style="max-width: 150px;">
+                                        <strong>Cat:</strong> {{ ouvrage.categories }}
+                                    </small>
+                                    <small class="d-block text-muted text-truncate" style="max-width: 150px;">
+                                        <strong>Tag:</strong> {{ ouvrage.tags }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <small class="text-muted d-block" style="line-height: 1.4;">
+                                        {{ ouvrage.resume|slice(0, 90) }}...
+                                    </small>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ path('app_ouvrage_show', {'id': ouvrage.id}) }}"
+                                           class="btn btn-success btn-sm"
+                                           title="Gérer les exemplaires">
+                                            <i class="bi bi-box-seam"></i>
+                                        </a>
+                                        <a href="{{ path('app_ouvrage_edit', {'id': ouvrage.id}) }}"
+                                           class="btn btn-warning btn-sm text-dark"
+                                           title="Modifier">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a href="{{ path('app_ouvrage_delete', {'id': ouvrage.id}) }}"
+                                           class="btn btn-danger btn-sm"
+                                           title="Supprimer définitivement"
+                                           onclick="return confirm('Êtes-vous VRAIMENT sûr de vouloir supprimer ce livre ? Cela supprimera aussi tous ses exemplaires !');">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="bi bi-journal-x fs-1 d-block mb-3"></i>
+                                        Aucun livre trouvé avec ces critères.
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

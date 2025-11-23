@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter un exemplaire{% endblock %}
+
+{% block body %}
+    <div class="row justify-content-center mt-5 mb-5">
+        <div class="col-md-8 col-lg-6">
+
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+
+                {# Nouveau Stock #}
+                <div class="card-header bg-success text-white py-3 px-4 border-0">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3">
+                            <i class="bi bi-box-seam fs-4 text-white"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0 fw-bold">Nouveau Stock</h4>
+                            <small class="text-white-50">Ajout d'une copie physique</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 bg-white">
+
+                    {# Rappel du Livre #}
+                    <div class="alert alert-light border-start border-success border-4 shadow-sm mb-4">
+                        <h6 class="text-success fw-bold mb-1 text-uppercase small ls-1">
+                            <i class="bi bi-book me-2"></i>Livre concerné
+                        </h6>
+                        <p class="mb-0 text-dark lead fw-bold">{{ ouvrage.titre }}</p>
+                    </div>
+
+                    {{ form_start(form) }}
+
+                    <div class="mb-4">
+                        {# Cote #}
+                        <div class="form-floating mb-3">
+                            {{ form_widget(form.cote, {'attr': {'class': 'form-control', 'placeholder': 'Cote'}}) }}
+                            {{ form_label(form.cote) }}
+                        </div>
+
+                        {# État #}
+                        <div class="form-floating mb-3">
+                            {{ form_widget(form.etat, {'attr': {'class': 'form-select', 'placeholder': 'État'}}) }}
+                            {{ form_label(form.etat) }}
+                        </div>
+                    </div>
+
+                    {# Zone Disponibilité #}
+                    <div class="p-3 bg-light rounded border mb-4">
+                        <div class="form-check form-switch">
+                            {{ form_widget(form.disponible, {'attr': {'class': 'form-check-input', 'role': 'switch', 'style': 'cursor: pointer;'}}) }}
+
+                            <label class="form-check-label fw-bold text-dark" for="{{ form.disponible.vars.id }}">
+                                Disponibilité immédiate ?
+                            </label>
+                            <div class="form-text small mt-1 text-muted">
+                                <i class="bi bi-info-circle me-1"></i> Laissez activé si le livre peut être emprunté tout de suite.
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{{ path('app_ouvrage_show', {'id': ouvrage.id}) }}" class="btn btn-light border px-4 text-muted">
+                            Annuler
+                        </a>
+
+                        <button type="submit" class="btn btn-success btn-lg px-5 rounded-pill shadow-sm fw-bold">
+                            <i class="bi bi-plus-lg me-2"></i>Ajouter au stock
+                        </button>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

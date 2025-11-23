@@ -66,7 +66,7 @@ class Personne implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_MEMBER
+        // Tous les utilisateur on le role member
         $roles[] = 'ROLE_MEMBER';
 
         return array_unique($roles);
@@ -111,6 +111,6 @@ class Personne implements UserInterface, PasswordAuthenticatedUserInterface
     #[\Deprecated]
     public function eraseCredentials(): void
     {
-        // @deprecated, to be removed when upgrading to Symfony 8
+
     }
 }

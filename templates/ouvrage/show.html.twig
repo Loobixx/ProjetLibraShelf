@@ -1,54 +1,152 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Ouvrage{% endblock %}
+{% block title %}Détails : {{ ouvrage.titre }}{% endblock %}
 
 {% block body %}
-    <h1>Ouvrage</h1>
+    <div class="container mt-4 mb-5">
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ ouvrage.id }}</td>
-            </tr>
-            <tr>
-                <th>Titre</th>
-                <td>{{ ouvrage.titre }}</td>
-            </tr>
-            <tr>
-                <th>Editeur</th>
-                <td>{{ ouvrage.editeur }}</td>
-            </tr>
-            <tr>
-                <th>ISBN</th>
-                <td>{{ ouvrage.ISBN }}</td>
-            </tr>
-            <tr>
-                <th>Categories</th>
-                <td>{{ ouvrage.categories }}</td>
-            </tr>
-            <tr>
-                <th>Tags</th>
-                <td>{{ ouvrage.tags }}</td>
-            </tr>
-            <tr>
-                <th>Langues</th>
-                <td>{{ ouvrage.langues }}</td>
-            </tr>
-            <tr>
-                <th>Année</th>
-                <td>{{ ouvrage.annee }}</td>
-            </tr>
-            <tr>
-                <th>Résumé</th>
-                <td>{{ ouvrage.résumé }}</td>
-            </tr>
-        </tbody>
-    </table>
+        {# --- EN-TÊTE --- #}
+        <div class="d-flex align-items-center mb-4">
+            <a href="{{ path('app_ouvrage_index') }}" class="btn btn-outline-secondary me-3 shadow-sm">
+                <i class="bi bi-arrow-left me-2"></i>Retour
+            </a>
+            <div>
+                <h1 class="h2 fw-bold mb-0">Fiche Ouvrage</h1>
+                <span class="text-muted">ID #{{ ouvrage.id }}</span>
+            </div>
 
-    <a href="{{ path('app_ouvrage_index') }}">back to list</a>
+            {# Boutons d'actions #}
+            <div class="ms-auto">
+                <a href="{{ path('app_ouvrage_edit', {'id': ouvrage.id}) }}" class="btn btn-warning shadow-sm text-dark">
+                    <i class="bi bi-pencil-square me-2"></i>Modifier la fiche
+                </a>
+                <a href="{{ path('app_ouvrage_delete', {'id': ouvrage.id}) }}"
+                   class="btn btn-outline-danger ms-2"
+                   onclick="return confirm('Attention : Supprimer ce livre supprimera aussi tous ses exemplaires ! Continuer ?');">
+                    <i class="bi bi-trash"></i>
+                </a>
+            </div>
+        </div>
 
-    <a href="{{ path('app_ouvrage_edit', {'id': ouvrage.id}) }}">edit</a>
+        <div class="row">
 
-    {{ include('ouvrage/_delete_form.html.twig') }}
+            {# === COLONNE GAUCHE : TITRE, RÉSUMÉ & STOCK === #}
+            <div class="col-md-8">
+
+                {# CARTE 1 : LE LIVRE #}
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h2 class="display-6 fw-bold text-primary mb-3">{{ ouvrage.titre }}</h2>
+
+                        <h5 class="text-muted mb-2">Résumé</h5>
+                        <div class="p-3 bg-light rounded border">
+                            <p class="card-text mb-0" style="line-height: 1.6;">
+                                {{ ouvrage.resume|default('Aucun résumé disponible.') }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {# CARTE 2 : LE STOCK #}
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0 text-success"><i class="bi bi-box-seam me-2"></i>Gestion des exemplaires</h4>
+
+                        <a href="{{ path('app_ouvrage_add_exemplaire', {'id': ouvrage.id}) }}" class="btn btn-sm btn-success">
+                            <i class="bi bi-plus-lg me-1"></i>Ajouter un exemplaire
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-striped mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Cote</th>
+                                <th>État</th>
+                                <th class="text-end pe-4">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for exemplaire in ouvrage.exemplaires %}
+                                <tr>
+                                    <td class="ps-4 fw-bold">{{ exemplaire.cote }}</td>
+                                    <td>
+                                        {% if exemplaire.etat == 'Neuf' %}
+                                            <span class="text-success fw-bold">Neuf</span>
+                                        {% elseif exemplaire.etat == 'Hors-service' %}
+                                            <span class="text-danger fw-bold">Hors-service</span>
+                                        {% else %}
+                                            {{ exemplaire.etat }}
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <a href="{{ path('app_ouvrage_exemplaire_edit', {'id': ouvrage.id, 'exemplaire_id': exemplaire.id}) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center py-4 text-muted">
+                                        Aucun exemplaire physique pour ce livre.
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            {# === COLONNE DROITE : INFORMATIONS & AUTEURS === #}
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-dark text-white py-3">
+                        <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Informations</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+
+                            <li class="list-group-item px-0">
+                                <span class="text-muted d-block mb-2">Auteur(s)</span>
+                                {% for auteur in ouvrage.auteurs %}
+                                    <span class="badge bg-primary mb-1 fs-6">
+                                        <i class="bi bi-person-fill me-1"></i>{{ auteur.prenom }} {{ auteur.nom }}
+                                    </span>
+                                {% else %}
+                                    <em class="text-muted">Aucun auteur lié</em>
+                                {% endfor %}
+                            </li>
+
+                            <li class="list-group-item px-0 d-flex justify-content-between">
+                                <span class="text-muted">Éditeur</span>
+                                <strong>{{ ouvrage.editeur }}</strong>
+                            </li>
+                            <li class="list-group-item px-0 d-flex justify-content-between">
+                                <span class="text-muted">Année</span>
+                                <strong>{{ ouvrage.annee }}</strong>
+                            </li>
+                            <li class="list-group-item px-0 d-flex justify-content-between">
+                                <span class="text-muted">ISBN</span>
+                                <span class="badge bg-secondary">{{ ouvrage.ISBN }}</span>
+                            </li>
+                            <li class="list-group-item px-0">
+                                <span class="text-muted d-block mb-2">Langues</span>
+                                <strong>{{ ouvrage.langues }}</strong>
+                            </li>
+                            <li class="list-group-item px-0">
+                                <span class="text-muted d-block mb-2">Catégories</span>
+                                <strong>{{ ouvrage.categories }}</strong>
+                            </li>
+                            <li class="list-group-item px-0">
+                                <span class="text-muted d-block mb-2">Tags</span>
+                                <em>{{ ouvrage.tags }}</em>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
 {% endblock %}

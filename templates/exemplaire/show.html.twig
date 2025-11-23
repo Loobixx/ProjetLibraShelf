@@ -19,7 +19,6 @@
         <tr>
             <th>État</th>
             <td>
-                {# Petit bonus visuel : couleur selon l'état #}
                 {% if exemplaire.etat == 'Neuf' %}
                     <span style="color: green;">{{ exemplaire.etat }}</span>
                 {% elseif exemplaire.etat == 'Hors-service' %}
@@ -30,7 +29,7 @@
             </td>
         </tr>
 
-        {# === PARTIE 2 : LE LIVRE ASSOCIÉ (OUVRAGE) === #}
+        {# === PARTIE 2 : LE LIVRE ASSOCIÉ === #}
         <tr style="background-color: #f8f9fa;">
             <th colspan="2" class="text-center">Informations sur l'Ouvrage</th>
         </tr>
@@ -45,7 +44,6 @@
         <tr>
             <th>Auteur(s)</th>
             <td>
-                {# On doit boucler car il y a plusieurs auteurs #}
                 {% for auteur in exemplaire.ouvrage.auteurs %}
                     {{ auteur.prenom }} {{ auteur.nom }}
                     {% if not loop.last %}, {% endif %}
