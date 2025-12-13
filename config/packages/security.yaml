@@ -40,9 +40,9 @@ security:
 
     # === AJOUTEZ CECI MANUELLEMENT ===
     role_hierarchy:
-        ROLE_MEMBER: [ROLE_MEMBER]
-        ROLE_LIBRARIAN: [ROLE_LIBRARIAN]
-        ROLE_ADMIN: [ROLE_ADMIN]
+        ROLE_MEMBER: [ROLE_USER]
+        ROLE_LIBRARIAN: [ROLE_MEMBER]
+        ROLE_ADMIN: [ROLE_MEMBER]
 
 when@test:
     security:

@@ -72,7 +72,7 @@
                     {% endif %}
 
                         {# 3. MEMBRE #}
-                    {% if is_granted('ROLE_MEMBER') or is_granted('ROLE_USER') %}
+                    {% if is_granted('ROLE_MEMBER')%}
                         <div class="card welcome-card border-start border-success border-5 mb-4">
                             <div class="card-body p-4">
                                 <div class="d-flex align-items-center">
