@@ -1,19 +1,109 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Inscription - LibraShelf{% endblock %}
 
 {% block body %}
-    <h1>Register</h1>
+    <div class="container mt-5 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card shadow-lg border-0 rounded-lg">
 
-    {{ form_errors(registrationForm) }}
+                    {# En-tête de la carte #}
+                    <div class="card-header bg-primary text-white text-center py-4">
+                        <h3 class="font-weight-light my-2">Créer un compte</h3>
+                    </div>
 
-    {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.plainPassword, {
-            label: 'Password'
-        }) }}
-        {{ form_row(registrationForm.agreeTerms) }}
+                    <div class="card-body p-5">
+                        {{ form_start(registrationForm) }}
 
-        <button type="submit" class="btn">Register</button>
-    {{ form_end(registrationForm) }}
+                        {# Affiche les erreurs globales (ex: CSRF invalide) #}
+                        {% if not registrationForm.vars.valid %}
+                            <div class="alert alert-danger mb-3">
+                                Oups ! Il y a des erreurs dans le formulaire.
+                            </div>
+                        {% endif %}
+
+                        {# --- CHAMP EMAIL --- #}
+                        <div class="mb-3">
+                            {{ form_label(registrationForm.email, 'Adresse Email', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control', 'placeholder': 'exemple@email.com'}}) }}
+                            {{ form_errors(registrationForm.email) }}
+                        </div>
+
+                        <hr class="my-4">
+
+                        {# --- ZONE MOT DE PASSE --- #}
+
+                        {# On affiche ton message d'aide (Help) dans une alerte visible #}
+                        <div class="alert alert-info d-flex align-items-center" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <div class="small">
+                                {{ registrationForm.plainPassword.first.vars.help|default('Mot de passe sécurisé requis.') }}
+                            </div>
+                        </div>
+
+                        {# Champ 1 : Mot de passe #}
+                        <div class="mb-3">
+                            {{ form_label(registrationForm.plainPassword.first, null, {'label_attr': {'class': 'form-label'}}) }}
+
+                            <div class="input-group">
+                                {# On affiche le champ input de Symfony #}
+                                {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'form-control'}}) }}
+
+                                {# On colle le bouton à côté #}
+                                <button class="btn btn-outline-secondary toggle-password" type="button">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            {# Affichage des erreurs en dessous du groupe #}
+                            {{ form_errors(registrationForm.plainPassword.first) }}
+                        </div>
+
+                        {# Champ 2 : Confirmation (Optionnel, tu peux aussi mettre l'oeil ici si tu veux) #}
+                        <div class="mb-3">
+                            {{ form_label(registrationForm.plainPassword.second, null, {'label_attr': {'class': 'form-label'}}) }}
+
+                            <div class="input-group">
+                                {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'form-control'}}) }}
+
+                                <button class="btn btn-outline-secondary toggle-password" type="button">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            {{ form_errors(registrationForm.plainPassword.second) }}
+                        </div>
+
+                        <hr class="my-4">
+
+                        {# --- CONDITIONS D'UTILISATION --- #}
+                        <div class="form-check mb-3">
+                            {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
+                            <label class="form-check-label" for="{{ registrationForm.agreeTerms.vars.id }}">
+                                J'accepte les <a href="#" target="_blank">conditions d'utilisation</a>
+                            </label>
+                            <div class="text-danger small">
+                                {{ form_errors(registrationForm.agreeTerms) }}
+                            </div>
+                        </div>
+
+                        {# --- BOUTON D'ACTION --- #}
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                S'inscrire
+                            </button>
+                        </div>
+
+                        {{ form_end(registrationForm) }}
+                    </div>
+
+                    {# Pied de carte : Lien vers le login #}
+                    <div class="card-footer text-center py-3 bg-light">
+                        <div class="small">
+                            <a href="{{ path('app_login') }}">Vous avez déjà un compte ? Connectez-vous</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
