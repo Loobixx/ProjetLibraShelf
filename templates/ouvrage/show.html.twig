@@ -75,7 +75,7 @@
                                         {% elseif exemplaire.etat == 'Hors-service' %}
                                             <span class="text-danger fw-bold">Hors-service</span>
                                         {% else %}
-                                            {{ exemplaire.etat }}
+                                            {{ exemplaire.etat.label }}
                                         {% endif %}
                                     </td>
                                     <td class="text-end pe-4">

@@ -20,11 +20,11 @@
             <th>État</th>
             <td>
                 {% if exemplaire.etat == 'Neuf' %}
-                    <span style="color: green;">{{ exemplaire.etat }}</span>
+                    <span style="color: green;">{{ exemplaire.etat.label }}</span>
                 {% elseif exemplaire.etat == 'Hors-service' %}
-                    <span style="color: red;">{{ exemplaire.etat }}</span>
+                    <span style="color: red;">{{ exemplaire.etat.label }}</span>
                 {% else %}
-                    {{ exemplaire.etat }}
+                    {{ exemplaire.etat.label }}
                 {% endif %}
             </td>
         </tr>

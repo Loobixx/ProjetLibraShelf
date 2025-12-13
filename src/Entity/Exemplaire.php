@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\ExemplaireRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Enum\EtatOuvrage;
 
 #[ORM\Entity(repositoryClass: ExemplaireRepository::class)]
 class Exemplaire
@@ -16,8 +17,8 @@ class Exemplaire
     #[ORM\Column(length: 255, unique: true)]
     private ?string $cote = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $etat = null;
+    #[ORM\Column(enumType: EtatOuvrage::class)]
+    private ?EtatOuvrage $etat = null;
 
     #[ORM\Column]
     private ?bool $disponible = true;
@@ -43,12 +44,12 @@ class Exemplaire
         return $this;
     }
 
-    public function getEtat(): ?string
+    public function getEtat(): ?EtatOuvrage
     {
         return $this->etat;
     }
 
-    public function setEtat(string $etat): self
+    public function setEtat(EtatOuvrage $etat): self
     {
         $this->etat = $etat;
 

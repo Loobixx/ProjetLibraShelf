@@ -7,6 +7,7 @@ use App\Entity\Exemplaire;
 use App\Entity\Ouvrage;
 use App\Entity\Personne;
 use App\Entity\Reservation;
+use App\Enum\EtatOuvrage;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -37,11 +38,11 @@ class UserFixtures extends Fixture
 
         $librarian = new Personne();
         $librarian->setEmail('librarian1@gmail.com');
-        $librarian->setRoles(['ROLE_LIBRARIAN']); // Attention au nom du rôle (LIBRAIRE ou LIBRARIAN selon votre security.yaml)
+        $librarian->setRoles(['ROLE_LIBRARIAN']);
         $librarian->setPassword($this->passwordHasher->hashPassword($librarian, 'librarian1'));
         $manager->persist($librarian);
 
-        $memberVIP = new Personne(); // C'est VOUS
+        $memberVIP = new Personne();
         $memberVIP->setEmail('member1@gmail.com');
         $memberVIP->setRoles(['ROLE_MEMBRE']);
         $memberVIP->setPassword($this->passwordHasher->hashPassword($memberVIP, 'member1'));
@@ -109,59 +110,64 @@ class UserFixtures extends Fixture
             for ($j = 1; $j <= $nbExemplaires; $j++) {
                 $exemplaire = new Exemplaire();
                 $exemplaire->setOuvrage($ouvrage);
-                // Cote style bibliothèque : 3 lettres auteur + chiffre
-                $cote = strtoupper(substr($ouvrage->getEditeur(), 0, 3)) . '-' . $faker->numberBetween(10000, 99999);
+
+                // Cote : 3 lettres éditeur + chiffre
+                // Sécurité : si pas d'éditeur, on met 'LIB'
+                $prefix = $ouvrage->getEditeur() ? substr($ouvrage->getEditeur(), 0, 3) : 'LIB';
+                $cote = strtoupper($prefix) . '-' . $faker->numberBetween(10000, 99999);
                 $exemplaire->setCote($cote);
-                $exemplaire->setEtat($faker->randomElement(['Neuf', 'Bon', 'Usagé']));
+
+                // --- MODIFICATION ICI ---
+                // On utilise l'Enum au lieu des strings.
+                // On n'inclut PAS 'EtatOuvrage::LOST' comme tu as demandé.
+                $exemplaire->setEtat($faker->randomElement([
+                    EtatOuvrage::NEW,      // Neuf
+                    EtatOuvrage::GOOD,     // Bon état
+                    EtatOuvrage::DAMAGED   // Abîmé
+                ]));
+
                 $exemplaire->setDisponible(true); // Par défaut
 
                 // SCÉNARIOS D'EMPRUNT
                 $scenario = $faker->numberBetween(1, 10);
 
                 if ($scenario <= 3) {
-                    // --- CAS A : LIVRE EMPRUNTÉ (En cours) ---
-                    // 30% de chance
+                    // --- CAS A : LIVRE EMPRUNTÉ ---
                     $exemplaire->setDisponible(false);
 
                     $resa = new Reservation();
                     $resa->setOuvrage($ouvrage);
                     $resa->setExemplaire($exemplaire);
 
-                    // On force quelques emprunts pour VOUS (member1)
                     if ($i < 5 && $j == 1) {
-                        $emprunteur = $memberVIP; // Les 5 premiers livres sont pour vous !
+                        $emprunteur = $memberVIP;
                     } else {
                         $emprunteur = $faker->randomElement($randomMembers);
                     }
                     $resa->setPersonne($emprunteur);
 
-                    // Dates
                     $dateEmprunt = \DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-20 days', 'now'));
                     $resa->setDateReservation($dateEmprunt);
-                    // Retour prévu dans le futur
                     $resa->setDateRetourPrevue($dateEmprunt->modify('+30 days'));
 
                     $manager->persist($resa);
 
                 } elseif ($scenario <= 5) {
-                    // --- CAS B : LIVRE RENDU (Historique) ---
-                    // 20% de chance
+                    // --- CAS B : LIVRE RENDU ---
                     $exemplaire->setDisponible(true);
 
                     $resa = new Reservation();
                     $resa->setOuvrage($ouvrage);
                     $resa->setExemplaire($exemplaire);
-                    $resa->setPersonne($faker->randomElement($randomMembers)); // Peut être vous ou un autre
+                    $resa->setPersonne($faker->randomElement($randomMembers));
 
-                    // Dates passées
                     $dateEmprunt = \DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-6 months', '-2 months'));
                     $resa->setDateReservation($dateEmprunt);
                     $resa->setDateRetourPrevue($dateEmprunt->modify('+30 days'));
-                    $resa->setDateRetourReelle($dateEmprunt->modify('+' . $faker->numberBetween(5, 35) . ' days')); // Rendu un peu avant ou après
+                    $resa->setDateRetourReelle($dateEmprunt->modify('+' . $faker->numberBetween(5, 35) . ' days'));
 
                     $manager->persist($resa);
                 }
-                // Sinon (50%), le livre est juste disponible en rayon sans historique récent.
 
                 $manager->persist($exemplaire);
             }
