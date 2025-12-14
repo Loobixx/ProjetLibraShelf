@@ -21,4 +21,13 @@ class ReservationRepository extends ServiceEntityRepository
         parent::__construct($registry, Reservation::class);
     }
 
+    public function findLateReturns(): array
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.dateRetourReelle IS NULL') // Pas encore rendu
+            ->andWhere('r.dateRetourPrevue < :now')  // Date dépassée
+            ->setParameter('now', new \DateTimeImmutable())
+            ->getQuery()
+            ->getResult();
+    }
 }

@@ -27,7 +27,7 @@ class UserFixtures extends Fixture
         $faker = Factory::create('fr_FR');
 
         // ======================================================
-        // 1. UTILISATEURS FIXES (Pour se connecter)
+        // 1. UTILISATEURS FIXES
         // ======================================================
 
         $admin = new Personne();
@@ -58,7 +58,6 @@ class UserFixtures extends Fixture
             $manager->persist($m);
             $randomMembers[] = $m;
         }
-        // On vous ajoute à la liste des membres potentiels pour les tirages au sort
         $randomMembers[] = $memberVIP;
 
 
@@ -92,7 +91,6 @@ class UserFixtures extends Fixture
             $ouvrage->setCategories($faker->randomElement($categories));
             $ouvrage->setTags(implode(', ', $faker->randomElements($tagsList, 2)));
 
-            // Auteurs (1 ou 2)
             $nbAuteurs = $faker->numberBetween(1, 2);
             for ($k = 0; $k < $nbAuteurs; $k++) {
                 $ouvrage->addAuteur($faker->randomElement($listeAuteurs));
@@ -104,7 +102,7 @@ class UserFixtures extends Fixture
             // 4. EXEMPLAIRES & SITUATIONS
             // ======================================================
 
-            // On décide aléatoirement du nombre d'exemplaires (0 à 4)
+            // On décide aléatoirement du nombre d'exemplaires
             $nbExemplaires = $faker->numberBetween(0, 4);
 
             for ($j = 1; $j <= $nbExemplaires; $j++) {
@@ -112,48 +110,69 @@ class UserFixtures extends Fixture
                 $exemplaire->setOuvrage($ouvrage);
 
                 // Cote : 3 lettres éditeur + chiffre
-                // Sécurité : si pas d'éditeur, on met 'LIB'
                 $prefix = $ouvrage->getEditeur() ? substr($ouvrage->getEditeur(), 0, 3) : 'LIB';
                 $cote = strtoupper($prefix) . '-' . $faker->numberBetween(10000, 99999);
                 $exemplaire->setCote($cote);
 
-                // --- MODIFICATION ICI ---
-                // On utilise l'Enum au lieu des strings.
-                // On n'inclut PAS 'EtatOuvrage::LOST' comme tu as demandé.
+                // État via Enum
                 $exemplaire->setEtat($faker->randomElement([
-                    EtatOuvrage::NEW,      // Neuf
-                    EtatOuvrage::GOOD,     // Bon état
-                    EtatOuvrage::DAMAGED   // Abîmé
+                    EtatOuvrage::NEW,
+                    EtatOuvrage::GOOD,
+                    EtatOuvrage::DAMAGED
                 ]));
 
-                $exemplaire->setDisponible(true); // Par défaut
+                $exemplaire->setDisponible(true);
 
                 // SCÉNARIOS D'EMPRUNT
                 $scenario = $faker->numberBetween(1, 10);
 
-                if ($scenario <= 3) {
-                    // --- CAS A : LIVRE EMPRUNTÉ ---
+                // --- SCENARIO 1 : RETARD IMPORTANT (20% de chance) ---
+                if ($scenario <= 2) {
                     $exemplaire->setDisponible(false);
 
                     $resa = new Reservation();
                     $resa->setOuvrage($ouvrage);
                     $resa->setExemplaire($exemplaire);
 
-                    if ($i < 5 && $j == 1) {
-                        $emprunteur = $memberVIP;
+                    // On attribue quelques retards spécifiquement à member1 pour le test
+                    if ($i < 3 && $j == 1) {
+                        $resa->setPersonne($memberVIP);
                     } else {
-                        $emprunteur = $faker->randomElement($randomMembers);
+                        $resa->setPersonne($faker->randomElement($randomMembers));
                     }
-                    $resa->setPersonne($emprunteur);
 
-                    $dateEmprunt = \DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-20 days', 'now'));
+                    // Emprunté il y a 60 jours
+                    $dateEmprunt = \DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-90 days', '-60 days'));
                     $resa->setDateReservation($dateEmprunt);
+
+                    // Devait être rendu il y a 30 jours (donc RETARD)
+                    $resa->setDateRetourPrevue($dateEmprunt->modify('+30 days'));
+                    $resa->setDateRetourReelle(null); // Pas rendu
+
+                    $manager->persist($resa);
+
+                }
+                // --- SCENARIO 2 : EMPRUNT EN COURS NORMAL (30% de chance) ---
+                elseif ($scenario <= 5) {
+                    $exemplaire->setDisponible(false);
+
+                    $resa = new Reservation();
+                    $resa->setOuvrage($ouvrage);
+                    $resa->setExemplaire($exemplaire);
+                    $resa->setPersonne($faker->randomElement($randomMembers));
+
+                    // Emprunté récemment
+                    $dateEmprunt = \DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-15 days', 'now'));
+                    $resa->setDateReservation($dateEmprunt);
+
+                    // A rendre dans le futur
                     $resa->setDateRetourPrevue($dateEmprunt->modify('+30 days'));
 
                     $manager->persist($resa);
 
-                } elseif ($scenario <= 5) {
-                    // --- CAS B : LIVRE RENDU ---
+                }
+                // --- SCENARIO 3 : LIVRE RENDU / HISTORIQUE (20% de chance) ---
+                elseif ($scenario <= 7) {
                     $exemplaire->setDisponible(true);
 
                     $resa = new Reservation();
@@ -161,6 +180,7 @@ class UserFixtures extends Fixture
                     $resa->setExemplaire($exemplaire);
                     $resa->setPersonne($faker->randomElement($randomMembers));
 
+                    // Vieux emprunts terminés
                     $dateEmprunt = \DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-6 months', '-2 months'));
                     $resa->setDateReservation($dateEmprunt);
                     $resa->setDateRetourPrevue($dateEmprunt->modify('+30 days'));
@@ -168,6 +188,7 @@ class UserFixtures extends Fixture
 
                     $manager->persist($resa);
                 }
+                // Sinon
 
                 $manager->persist($exemplaire);
             }
@@ -175,15 +196,13 @@ class UserFixtures extends Fixture
             // ======================================================
             // 5. LISTE D'ATTENTE (Sur certains livres)
             // ======================================================
-            // Si le livre a peu d'exemplaires ou est populaire, on ajoute une file d'attente
             if ($nbExemplaires < 2 && $faker->boolean(40)) {
                 $resaAttente = new Reservation();
                 $resaAttente->setOuvrage($ouvrage);
-                $resaAttente->setExemplaire(null); // Pas d'exemplaire = Liste d'attente
+                $resaAttente->setExemplaire(null);
                 $resaAttente->setDateRetourPrevue(null);
                 $resaAttente->setDateRetourReelle(null);
 
-                // On met VOUS en liste d'attente sur quelques livres
                 if ($i > 10 && $i < 13) {
                     $attendeur = $memberVIP;
                 } else {
