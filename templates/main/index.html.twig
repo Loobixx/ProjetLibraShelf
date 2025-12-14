@@ -2,21 +2,6 @@
 
 {% block title %}Accueil - LibraShelf{% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    <style>
-        .welcome-card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            transition: transform 0.3s ease;
-        }
-        .welcome-card:hover { transform: translateY(-5px); }
-        .role-icon { font-size: 3rem; margin-bottom: 1rem; }
-        .btn-space { margin-right: 10px; margin-bottom: 10px; }
-    </style>
-{% endblock %}
-
 {% block body %}
     <div class="container mt-5">
 

@@ -1,3 +1,64 @@
-body {
-    background-color: skyblue;
+/* assets/styles/app.css */
+
+.alerte-retard {
+    margin-top: 0.25rem;    /* Correspond à mt-1 */
+    color: #dc3545;         /* Correspond à text-danger (Rouge Bootstrap) */
+    font-weight: 700;       /* Correspond à fw-bold */
+    font-size: 0.875em;     /* Correspond à small */
+    display: flex;          /* Pour aligner l'icône et le texte proprement */
+    align-items: center;
 }
+
+.alerte-retard i {
+    margin-right: 0.25rem;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Navbar personnalisée */
+.navbar { padding-top: 0.8rem; padding-bottom: 0.8rem; }
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.3rem;
+    letter-spacing: -0.5px;
+}
+
+/* Effet de soulignement au survol */
+.navbar-dark .navbar-nav .nav-link {
+    position: relative;
+    padding-bottom: 5px;
+    transition: color 0.3s;
+}
+.navbar-dark .navbar-nav .nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(255,255,255,0.8);
+    transition: width 0.3s ease-in-out;
+}
+.navbar-dark .navbar-nav .nav-link:hover::after {
+    width: 100%;
+}
+
+/* Ajustements pour le footer */
+main { flex: 1; }
+footer { margin-top: auto; padding: 2rem 0; background-color: #e9ecef; }
+
+.welcome-card {
+     border: none;
+     border-radius: 15px;
+     box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+     transition: transform 0.3s ease;
+ }
+.welcome-card:hover { transform: translateY(-5px); }
+.role-icon { font-size: 3rem; margin-bottom: 1rem; }
+.btn-space { margin-right: 10px; margin-bottom: 10px; }
