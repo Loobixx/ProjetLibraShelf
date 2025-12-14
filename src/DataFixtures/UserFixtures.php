@@ -82,7 +82,8 @@ class UserFixtures extends Fixture
 
         for ($i = 0; $i < 200; $i++) {
             $ouvrage = new Ouvrage();
-            $ouvrage->setTitre($faker->catchPhrase());
+            $titreAleatoire = ucfirst($faker->words($faker->numberBetween(2, 5), true));
+            $ouvrage->setTitre($titreAleatoire);
             $ouvrage->setEditeur($faker->company());
             $ouvrage->setIsbn($faker->isbn13());
             $ouvrage->setAnnee((string)$faker->year());
