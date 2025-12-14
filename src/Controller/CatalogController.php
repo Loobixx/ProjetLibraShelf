@@ -87,11 +87,18 @@ class CatalogController extends AbstractController
             }
         }
 
+        // 1. On va chercher la configuration en base de données
+        $config = $entityManager->getRepository(Configuration::class)->findOneBy([]);
+
+        // 2. On récupère le montant (avec une sécurité si la config n'existe pas encore)
+        $montantPenalite = $config ? $config->getMontantPenalite() : 0.5;
+
         return $this->render('catalog/mes_reservations.html.twig', [
             'reservations' => $reservations,
             'emprunts' => $emprunts,
             'attentes' => $attentes,
             'archives' => $archives,
+            'montantPenalite' => $montantPenalite,
         ]);
     }
 
