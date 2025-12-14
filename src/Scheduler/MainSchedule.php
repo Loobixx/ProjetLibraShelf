@@ -2,7 +2,8 @@
 
 namespace App\Scheduler;
 
-use App\Scheduler\Message\CheckLateLoansMessage;
+use App\Scheduler\Message\PurgeOldDataMessage;
+use App\Scheduler\Message\SendRemindersMessage;
 use Symfony\Component\Scheduler\Attribute\AsSchedule;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
@@ -13,11 +14,11 @@ class MainSchedule implements ScheduleProviderInterface
 {
     public function getSchedule(): Schedule
     {
-        // CORRECTION ICI : On utilise (new Schedule()) au lieu de Schedule::with()
-        return (new Schedule())
-            ->add(
-                RecurringMessage::cron('0 8 * * *', new CheckLateLoansMessage())
-            )
-            ;
+        return (new Schedule())->add(
+
+            RecurringMessage::cron('0 8 * * *', new SendRemindersMessage()),
+
+            RecurringMessage::cron('0 2 * * *', new PurgeOldDataMessage())
+        );
     }
 }

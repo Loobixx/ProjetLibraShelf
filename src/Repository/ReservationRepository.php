@@ -30,4 +30,29 @@ class ReservationRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findDueAt(\DateTimeInterface $dateCible): array
+    {
+        // On clone pour ne pas modifier l'objet original et on définit l'intervalle de la journée (00:00 à 23:59)
+        $start = (clone $dateCible)->setTime(0, 0, 0);
+        $end   = (clone $dateCible)->setTime(23, 59, 59);
+
+        return $this->createQueryBuilder('r')
+            ->where('r.dateRetourPrevue BETWEEN :start AND :end')
+            ->andWhere('r.dateRetourReelle IS NULL') // Pas encore rendu
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findOldHistory(\DateTimeInterface $dateLimite): array
+    {
+        return $this->createQueryBuilder('r')
+            ->where('r.dateRetourReelle IS NOT NULL') // C'est rendu
+            ->andWhere('r.dateRetourReelle < :limite') // C'est vieux
+            ->setParameter('limite', $dateLimite)
+            ->getQuery()
+            ->getResult();
+    }
 }
