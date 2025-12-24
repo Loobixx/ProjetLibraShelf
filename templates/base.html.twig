@@ -38,6 +38,15 @@
                     </a>
                 </li>
 
+                {# === MES RESERVATIONS === #}
+                {% if is_granted('ROLE_MEMBER') %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_catalog_mes_reservations') }}">
+                            Mes Réservations
+                        </a>
+                    </li>
+                {% endif %}
+
                 {# === LIBRAIRE === #}
                 {% if is_granted('ROLE_LIBRARIAN') %}
                     <li class="nav-item ms-lg-2">
