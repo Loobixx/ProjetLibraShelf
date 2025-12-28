@@ -30,21 +30,28 @@
                                 <span class="input-group-text bg-white border-end-0 text-muted">
                                     <i class="bi bi-search"></i>
                                 </span>
-                                {{ form_widget(formFilter.query, {'attr': {'class': 'form-control border-start-0 ps-0', 'placeholder': 'Rechercher un titre...'}}) }}
+                                {{ form_widget(formFilter.query, {
+                                    'attr': {
+                                        'class': 'form-control border-start-0 ps-0',
+                                        'placeholder': 'Rechercher un titre...',
+                                        'aria-label': 'Rechercher un livre par titre'
+                                    }
+                                }) }}
                             </div>
                         </div>
 
                         {# 2. FILTRES SECONDAIRES #}
                         <div class="col-lg-2 col-md-4">
-                            {{ form_widget(formFilter.auteur, {'attr': {'class': 'form-select', 'aria-label': 'Auteur'}}) }}
-                        </div>
-                        <div class="col-lg-2 col-md-4">
-                            {{ form_widget(formFilter.categorie, {'attr': {'class': 'form-control', 'placeholder': 'Catégorie'}}) }}
-                        </div>
-                        <div class="col-lg-2 col-md-4">
-                            {{ form_widget(formFilter.sort, {'attr': {'class': 'form-select'}}) }}
+                            {{ form_widget(formFilter.auteur, {'attr': {'class': 'form-select', 'aria-label': 'Filtrer par auteur'}}) }}
                         </div>
 
+                        <div class="col-lg-2 col-md-4">
+                            {{ form_widget(formFilter.categorie, {'attr': {'class': 'form-control', 'placeholder': 'Catégorie', 'aria-label': 'Filtrer par catégorie'}}) }}
+                        </div>
+
+                        <div class="col-lg-2 col-md-4">
+                            {{ form_widget(formFilter.sort, {'attr': {'class': 'form-select', 'aria-label': 'Trier les résultats'}}) }}
+                        </div>
                         {# 3. BOUTON ACTION #}
                         <div class="col-lg-2 col-md-12">
                             <button type="submit" class="btn btn-primary w-100 fw-bold">
