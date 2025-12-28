@@ -4,10 +4,9 @@ namespace App\Enum;
 
 enum EtatOuvrage: string
 {
-    case NEW = 'new';
-    case GOOD = 'good';
-    case DAMAGED = 'damaged';
-    case LOST = 'lost';
+    case NEW = 'NEW';
+    case GOOD = 'GOOD';
+    case DAMAGED = 'DAMAGED';
 
     // Cette méthode permet d'afficher un joli nom en français partout
     public function getLabel(): string
@@ -24,9 +23,8 @@ enum EtatOuvrage: string
     {
         return match ($this) {
             self::NEW => 'success',      // Vert
-            self::GOOD => 'info',        // Bleu
-            self::DAMAGED => 'warning',  // Jaune/Orange
-            self::LOST => 'danger',      // Rouge
+            self::GOOD => 'warning',        // Bleu
+            self::DAMAGED => 'danger',  // Jaune/Orange
         };
     }
 }

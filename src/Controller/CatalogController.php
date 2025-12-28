@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Configuration;
 use App\Entity\Ouvrage;
 use App\Entity\Reservation;
+use App\Enum\EtatOuvrage;
 use App\Form\OuvrageFilterType;
 use App\Repository\OuvrageRepository;
 use App\Repository\ReservationRepository;
@@ -142,12 +143,23 @@ class CatalogController extends AbstractController
         $reservation->setOuvrage($ouvrage);
 
         if (!empty($exemplairesDispo)) {
-            $ordreEtats = ['Neuf' => 1, 'Bon' => 2, 'Usagé' => 3, 'Endommagé' => 4, 'Hors-service' => 5];
+            $ordreEtats = [
+                'NEW' => 1,
+                'GOOD' => 2,
+                'DAMAGED' => 3,
+            ];
+
             $meilleurExemplaire = null;
             $meilleurScore = 99;
 
             foreach ($exemplairesDispo as $ex) {
-                $score = $ordreEtats[$ex->getEtat()] ?? 3;
+                $score = match ($ex->getEtat()) {
+                    EtatOuvrage::NEW => 1,
+                    EtatOuvrage::GOOD => 2,
+                    EtatOuvrage::DAMAGED => 3,
+                    default => 5
+                };
+
                 if ($score < $meilleurScore) {
                     $meilleurScore = $score;
                     $meilleurExemplaire = $ex;

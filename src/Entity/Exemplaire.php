@@ -5,8 +5,12 @@ namespace App\Entity;
 use App\Repository\ExemplaireRepository;
 use Doctrine\ORM\Mapping as ORM;
 use App\Enum\EtatOuvrage;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: ExemplaireRepository::class)]
+// RÈGLE GLOBALE : Vérifie en base si la cote existe déjà
+#[UniqueEntity(fields: ['cote'], message: "Cette cote est déjà utilisée par un autre livre.")]
 class Exemplaire
 {
     #[ORM\Id]
@@ -15,6 +19,8 @@ class Exemplaire
     private ?int $id = null;
 
     #[ORM\Column(length: 255, unique: true)]
+    #[Assert\NotBlank(message: "La cote est obligatoire.")]
+    #[Assert\Length(min: 3, minMessage: "La cote doit faire au moins 3 caractères.")]
     private ?string $cote = null;
 
     #[ORM\Column(enumType: EtatOuvrage::class)]
@@ -25,6 +31,8 @@ class Exemplaire
 
     #[ORM\ManyToOne(inversedBy: 'exemplaires')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    // RÈGLE : Un exemplaire ne peut pas exister sans livre parent
+    #[Assert\NotNull(message: "Vous devez associer cet exemplaire à un ouvrage.")]
     private ?Ouvrage $ouvrage = null;
 
     public function getId(): ?int

@@ -19,13 +19,9 @@
         <tr>
             <th>État</th>
             <td>
-                {% if exemplaire.etat == 'Neuf' %}
-                    <span style="color: green;">{{ exemplaire.etat.label }}</span>
-                {% elseif exemplaire.etat == 'Hors-service' %}
-                    <span style="color: red;">{{ exemplaire.etat.label }}</span>
-                {% else %}
+                <span class="badge bg-{{ exemplaire.etat.badgeColor }}">
                     {{ exemplaire.etat.label }}
-                {% endif %}
+                </span>
             </td>
         </tr>
 

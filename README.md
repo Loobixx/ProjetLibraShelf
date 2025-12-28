@@ -67,7 +67,7 @@ Avant de commencer, assurez-vous d’avoir installé :
 Cloner le dépôt :
 
 ```bash
-    git clone https://github.com/votre-pseudo/librashelf.git
+    git clone https://github.com/Loobixx/ProjetLibraShelf.git
     cd librashelf
 ```
 

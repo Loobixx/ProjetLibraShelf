@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OuvrageRepository::class)]
 class Ouvrage
@@ -17,9 +18,18 @@ class Ouvrage
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    // RÈGLE : Pas vide
+    #[Assert\NotBlank(message: "Le titre du livre est obligatoire.")]
+    // RÈGLE : Entre 2 et 255 caractères
+    #[Assert\Length(
+        min: 2,
+        max: 255,
+        minMessage: "Le titre est trop court (min {{ limit }} lettres)."
+    )]
     private ?string $titre = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "L'éditeur est obligatoire.")]
     private ?string $editeur = null;
 
     #[ORM\Column(type: Types::STRING, length: 255, unique: true, nullable: true)]
@@ -32,9 +42,15 @@ class Ouvrage
     private ?string $tags = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Ajoutez au moins une langue.")]
     private ?string $langues = null;
 
     #[ORM\Column(length: 255)]
+    // RÈGLE : Exactement 4 chiffres (ex: 2024)
+    #[Assert\Regex(
+        pattern: "/^\d{4}$/",
+        message: "L'année doit être composée de 4 chiffres (ex: 1998)."
+    )]
     private ?string $annee = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]

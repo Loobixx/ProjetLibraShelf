@@ -70,13 +70,9 @@
                                 <tr>
                                     <td class="ps-4 fw-bold">{{ exemplaire.cote }}</td>
                                     <td>
-                                        {% if exemplaire.etat == 'Neuf' %}
-                                            <span class="text-success fw-bold">Neuf</span>
-                                        {% elseif exemplaire.etat == 'Hors-service' %}
-                                            <span class="text-danger fw-bold">Hors-service</span>
-                                        {% else %}
+                                        <span class="badge bg-{{ exemplaire.etat.badgeColor }}">
                                             {{ exemplaire.etat.label }}
-                                        {% endif %}
+                                        </span>
                                     </td>
                                     <td class="text-end pe-4">
                                         <a href="{{ path('app_ouvrage_exemplaire_edit', {'id': ouvrage.id, 'exemplaire_id': exemplaire.id}) }}" class="btn btn-sm btn-outline-primary">
