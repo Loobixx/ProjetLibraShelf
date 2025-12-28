@@ -24,8 +24,10 @@ class Ouvrage
     #[Assert\Length(
         min: 2,
         max: 255,
-        minMessage: "Le titre est trop court (min {{ limit }} lettres)."
-    )]
+        minMessage: "Le titre est trop court (min {{ limit }} caractères).",
+        maxMessage: "Le titre est trop long."
+
+)]
     private ?string $titre = null;
 
     #[ORM\Column(length: 255)]

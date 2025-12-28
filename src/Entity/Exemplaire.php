@@ -9,8 +9,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: ExemplaireRepository::class)]
-// RÈGLE GLOBALE : Vérifie en base si la cote existe déjà
-#[UniqueEntity(fields: ['cote'], message: "Cette cote est déjà utilisée par un autre livre.")]
+#[UniqueEntity(fields: ['cote'], message: "Cette cote existe déjà !")]
 class Exemplaire
 {
     #[ORM\Id]
@@ -31,6 +30,8 @@ class Exemplaire
 
     #[ORM\ManyToOne(inversedBy: 'exemplaires')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[ORM\Column(length: 255, unique: true)]
+    #[Assert\NotBlank(message: "La cote est obligatoire.")]
     // RÈGLE : Un exemplaire ne peut pas exister sans livre parent
     #[Assert\NotNull(message: "Vous devez associer cet exemplaire à un ouvrage.")]
     private ?Ouvrage $ouvrage = null;
